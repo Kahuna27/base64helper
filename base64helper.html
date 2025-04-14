@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html>
-  <body>
-    <input type="file" id="fileInput" />
-    <script>
-      window.addEventListener("message", async (event) => {
-        const fileURL = event.data;
-        try {
-          const response = await fetch(fileURL);
-          const blob = await response.blob();
-          const reader = new FileReader();
-          reader.onloadend = function () {
-            const base64 = reader.result.split(',')[1]; // Strip metadata
-            window.ReactNativeWebView.postMessage(base64);
-          };
-          reader.readAsDataURL(blob);
-        } catch (err) {
-          window.ReactNativeWebView.postMessage("ERROR: " + err.message);
-        }
-      });
-    </script>
-  </body>
+<head>
+  <title>Base64 Converter</title>
+</head>
+<body>
+  <h2>Select an audio file</h2>
+  <input type="file" id="fileInput" accept="audio/*">
+  <script>
+    document.getElementById("fileInput").addEventListener("change", function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        const base64Data = reader.result.split(',')[1]; // Remove the data prefix
+        // Send base64 back to Thunkable
+        window.parent.postMessage(base64Data, "*");
+      };
+      reader.readAsDataURL(file); // Converts to base64
+    });
+  </script>
+</body>
 </html>
