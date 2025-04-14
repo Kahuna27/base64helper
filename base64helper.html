@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <input type="file" id="fileInput" />
+    <script>
+      window.addEventListener("message", async (event) => {
+        const fileURL = event.data;
+        try {
+          const response = await fetch(fileURL);
+          const blob = await response.blob();
+          const reader = new FileReader();
+          reader.onloadend = function () {
+            const base64 = reader.result.split(',')[1]; // Strip metadata
+            window.ReactNativeWebView.postMessage(base64);
+          };
+          reader.readAsDataURL(blob);
+        } catch (err) {
+          window.ReactNativeWebView.postMessage("ERROR: " + err.message);
+        }
+      });
+    </script>
+  </body>
+</html>
